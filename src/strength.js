@@ -1,5 +1,5 @@
 /*!
- * strength.js
+ * rihardsp fork of strength.js
  * Original author: @aaronlumsden
  * Further changes, comments: @aaronlumsden
  * Licensed under the MIT license
@@ -9,6 +9,7 @@
     var pluginName = "strength",
         defaults = {
             strengthClass: 'strength',
+            strengthWrapperClass: null,
             strengthMeterClass: 'strength_meter',
             strengthButtonClass: 'button_strength',
             strengthButtonText: 'Show Password',
@@ -95,11 +96,16 @@
             var isShown = false;
             var strengthButtonText = this.options.strengthButtonText;
             var strengthButtonTextToggle = this.options.strengthButtonTextToggle;
-
+            var strengthWrapperClass = $(document).find('.' + this.options.strengthWrapperClass);
 
             thisid = this.$elem.attr('id');
 
-            this.$elem.addClass(this.options.strengthClass).attr('data-password',thisid).after('<input style="display:none" class="'+this.options.strengthClass+'" data-password="'+thisid+'" type="text" name="" value=""><a data-password-button="'+thisid+'" href="" class="'+this.options.strengthButtonClass+'">'+this.options.strengthButtonText+'</a><div class="'+this.options.strengthMeterClass+'"><div data-meter="'+thisid+'">'+this.options.strengthMeterText+'</div></div>');
+            if (!this.options.strengthWrapperClass) {
+                this.$elem.addClass(this.options.strengthClass).attr('data-password',thisid).after('<input style="display:none" class="'+this.options.strengthClass+'" data-password="'+thisid+'" type="text" name="" value=""><a data-password-button="'+thisid+'" href="" class="'+this.options.strengthButtonClass+'">'+this.options.strengthButtonText+'</a><div class="'+this.options.strengthMeterClass+'"><div data-meter="'+thisid+'">'+this.options.strengthMeterText+'</div></div>');
+            } else {
+                this.$elem.addClass(this.options.strengthClass).attr('data-password',thisid).after('<input style="display:none" class="'+this.options.strengthClass+'" data-password="'+thisid+'" type="text" name="" value="">');
+                strengthWrapperClass.html('<a data-password-button="'+thisid+'" href="" class="'+this.options.strengthButtonClass+'">'+this.options.strengthButtonText+'</a><div class="'+this.options.strengthMeterClass+'"><div data-meter="'+thisid+'">'+this.options.strengthMeterText+'</div></div>');
+            }
              
             this.$elem.bind('keyup keydown', function(event) {
                 thisval = $('#'+thisid).val();
