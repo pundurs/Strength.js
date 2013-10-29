@@ -11,6 +11,7 @@
             strengthClass: 'strength',
             strengthWrapperClass: null,
             strengthWrapperFadeIn: 0,
+            strengthSecondaryFieldID: null,
             strengthMeterClass: 'strength_meter',
             strengthButtonClass: 'button_strength',
             strengthButtonText: 'Show Password',
@@ -116,10 +117,24 @@
                 this.$elem.addClass(this.options.strengthClass).attr('data-password',thisid).after('<input style="display:none" class="'+this.options.strengthClass+'" data-password="'+thisid+'" type="text" name="" value="">');
                 strengthWrapper.html('<a data-password-button="'+thisid+'" href="" class="'+this.options.strengthButtonClass+'">'+this.options.strengthButtonText+'</a><div class="'+this.options.strengthMeterClass+'"><div data-meter="'+thisid+'">'+this.options.strengthMeterText+'</div></div>');
             }
+            
+            if (this.options.strengthSecondaryFieldID != null) {
+                var secondaryField = $('#' + this.options.strengthSecondaryFieldID);
+                var secondaryFieldID = secondaryField.attr('id');
+                secondaryField.attr('data-password', secondaryFieldID);
+                secondaryField.after('<input style="display:none" class="'+this.options.strengthClass+'" data-password="'+secondaryFieldID+'" type="text" name="" value="" placeholder="' + secondaryField.attr("placeholder") + '">');
+                secondaryField.bind('keyup keydown', function(event) {
+                    var secondaryFieldVal = secondaryField.val();
+                    $('input[type="text"][data-password="'+secondaryFieldID+'"]').val(secondaryFieldVal);
+                });
+                $('input[type="text"][data-password="'+secondaryFieldID+'"]').bind('keyup keydown', function(event) {
+                    thisval = $('input[type="text"][data-password="'+secondaryFieldID+'"]').val();
+                    $('input[type="password"][data-password="'+secondaryFieldID+'"]').val(thisval);
+                });
+            }
              
             this.$elem.bind('keyup keydown', function(event) {
                 thisval = $('#'+thisid).val();
-
                 $('input[type="text"][data-password="'+thisid+'"]').val(thisval);
                 check_strength(thisval,thisid);
                 
@@ -135,6 +150,7 @@
 
 
 
+            
             $(document.body).on('click', '.'+this.options.strengthButtonClass, function(e) {
                 e.preventDefault();
 
@@ -145,12 +161,21 @@
 
                 if (isShown) {
                     $('input[type="text"][data-password="'+thisid+'"]').hide();
+                    secondaryFieldID && (function (secID) {
+                        $('input[type="password"][data-password='+secID+']').show();
+                        $('input[type="text"][data-password='+secID+']').hide();
+                    })(secondaryFieldID);
                     $('input[type="password"][data-password="'+thisid+'"]').show().focus();
+                    
                     $('a[data-password-button="'+thisid+'"]').removeClass(thisclass).html(strengthButtonText);
                     isShown = false;
 
                 } else {
                     $('input[type="text"][data-password="'+thisid+'"]').show().focus();
+                    secondaryFieldID && (function (secID) {
+                        $('input[type="password"][data-password='+secID+']').hide();
+                        $('input[type="text"][data-password='+secID+']').show();
+                    })(secondaryFieldID);
                     $('input[type="password"][data-password="'+thisid+'"]').hide();
                     $('a[data-password-button="'+thisid+'"]').addClass(thisclass).html(strengthButtonTextToggle);
                     isShown = true;
